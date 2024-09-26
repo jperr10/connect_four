@@ -15,6 +15,7 @@ describe Game do
     it 'shows the grid' do
       allow(game).to receive(:game_set_up)
       allow(game).to receive(:take_turns)
+      allow(game).to receive(:conclusion)
       expect(game.grid).to receive(:show)
       game.play
     end
@@ -38,9 +39,16 @@ describe Game do
       it 'updates the grid' do
         player_column_input = 1
         allow(game).to receive(:move_input).and_return(player_column_input)
-        expect(game.grid).to receive(:update_grid).with(player.game_piece, player_column_input)
+        allow(game.grid).to receive(:show)
+        expect(game.grid).to receive(:update).with(player.game_piece, player_column_input - 1)
         game.turn(player)
       end
+    end
+
+    context 'when grid has been partially filled in' do
+      it 'updates the grid' do
+
+      end if false
     end
   end
 end

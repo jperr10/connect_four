@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Game
-  attr_reader :first_player, :second_player, :grid
+  attr_reader :first_player, :second_player, :grid, :current_player
 
   def initialize
     @first_player = nil
@@ -14,6 +14,7 @@ class Game
     game_set_up
     grid.show
     take_turns
+    conclusion
   end
 
   def create_player(number, game_piece)
@@ -25,7 +26,7 @@ class Game
   
   def turn(player)
     column = move_input(player)
-    grid.update_grid(player.game_piece, column)
+    grid.update(player.game_piece, column - 1)
     grid.show
   end
 
@@ -41,7 +42,7 @@ class Game
     @current_player = first_player
     until grid.full?
       turn(current_player)
-      break if grid.winner?
+      break if grid.winner?(current_player.game_piece)
 
       @current_player = switch_current_player
     end
@@ -52,11 +53,19 @@ class Game
     input = gets.chomp.to_i
     return input if grid.valid_column?(input)
 
-    puts "That's not valid"
+    puts "That's not a valid column"
     move_input(player)
   end
 
   def switch_current_player
     current_player == first_player ? second_player : first_player
+  end
+
+  def conclusion
+    if grid.winner?(current_player.game_piece)
+      puts "#{current_player.name} wins!"
+    else
+      puts "It's a tie."
+    end
   end
 end

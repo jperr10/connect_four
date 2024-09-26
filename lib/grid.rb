@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
 class Grid
-  attr_reader :board, :available_columns
+  attr_reader :board, :available_columns, :current_move
+
+  FOUR_IN_A_ROW_COMBOS = [
+    [[1, 1], [2, 2], [3, 3]], [[1, 0], [2, 0], [3, 0]],
+    [[1, -1], [2, -2], [3, -3]], [[0, -1], [0, -2], [0, -3]],
+    [[-1, -1], [-2, -2], [-3, -3]], [[-1, 0], [-2, 0], [-3, 0]],
+    [[-1, 1], [-2, 2], [-3, 3]]
+  ].freeze
 
   def initialize
     @board = Array.new(7) { Array.new(6) }
     @available_columns = [1, 2, 3, 4, 5, 6, 7]
+    @current_move = nil
   end
 
   def show
@@ -36,10 +44,18 @@ class Grid
     available_columns.include?(column)
   end
 
-  def update_board(game_piece, column)
-    idx = nested_index(column)
-    board[column][idx] = game_piece
+  def update(game_piece, column)
+    update_current_move(column)
+    update_board(game_piece)
+    update_available_columns(column)
+  end
 
+  def update_current_move(column)
+    @current_move = [column, nested_index(column)]
+  end
+
+  def update_board(game_piece)
+    board[current_move[0]][current_move[1]] = game_piece
   end
 
   def nested_index(column)
@@ -50,8 +66,99 @@ class Grid
     available_columns.delete(column) if board[column - 1].none?(nil)
   end
 
-  def winner?
-    
+  def winner?(game_piece)
+    legs = possible_fours
+
+    legs.any? do |leg|
+      [board[leg[0][0]][leg[0][1]],
+      board[leg[1][0]][leg[1][1]],
+      board[leg[2][0]][leg[2][1]],
+      board[leg[3][0]][leg[3][1]]
+      ].all?(game_piece)
+    end
+  end
+
+  def possible_fours
+    result = []
+    legs = []
+
+    legs << positive_slope
+    legs << negative_slope
+    legs << zero_slope
+    legs << undefined_slope
+
+    legs.compact.select { |leg| leg.length > 0 }.each do |leg|
+      leg.each do |e|
+        result << e
+      end
+    end
+    result
+  end
+
+  def positive_slope
+    x_cord = current_move[0]
+    y_cord = current_move[1]
+    arr = []
+    i = 3
+    while i >= 0  do
+      arr << [
+        [x_cord + i, y_cord + i],
+        [x_cord + (i - 1), y_cord + (i - 1)],
+        [x_cord + (i - 2), y_cord + (i - 2)],
+        [x_cord + (i - 3), y_cord + (i - 3)]
+      ]
+      i -= 1
+    end
+    arr.select do |leg|
+      leg.all? { |cord| cord[0].between?(0, 6) && cord[1].between?(0, 5) }
+    end
+  end
+
+  def negative_slope
+    x_cord = current_move[0]
+    y_cord = current_move[1]
+    arr = []
+    i = 3
+    while i >= 0  do
+      arr << [
+        [x_cord - i, y_cord + i],
+        [x_cord - (i - 1), y_cord + (i - 1)],
+        [x_cord - (i - 2), y_cord + (i - 2)],
+        [x_cord - (i - 3), y_cord + (i - 3)]
+      ]
+      i -= 1
+    end
+    arr.select do |leg|
+      leg.all? { |cord| cord[0].between?(0, 6) && cord[1].between?(0, 5) }
+    end
+  end
+
+  def zero_slope
+    x_cord = current_move[0]
+    y_cord = current_move[1]
+    arr = []
+    i = 3
+    while i >= 0  do
+      arr << [
+        [x_cord + i, y_cord],
+        [x_cord + (i - 1), y_cord],
+        [x_cord + (i - 2), y_cord],
+        [x_cord + (i - 3), y_cord]
+      ]
+      i -= 1
+    end
+    arr.select do |leg|
+      leg.all? { |cord| cord[0].between?(0, 6) && cord[1].between?(0, 5) }
+    end
+  end
+
+  def undefined_slope
+    x_cord = current_move[0]
+    y_cord = current_move[1]
+    [
+      [[x_cord, y_cord - 3], [x_cord, y_cord - 2],
+      [x_cord, y_cord - 1], [x_cord, y_cord]]
+    ] if y_cord - 3 >= 0
   end
 
 end
