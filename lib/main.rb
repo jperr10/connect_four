@@ -11,7 +11,7 @@ def play_game
 end
 
 def repeat_game
-  puts "Would you like to play again? Type 'y' for yes or 'n' for no."
+  puts "\nWould you like to play again? Type 'y' for yes or 'n' for no."
   repeat_input = gets.chomp.downcase
   if repeat_input == 'y'
     play_game

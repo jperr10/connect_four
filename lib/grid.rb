@@ -11,12 +11,13 @@ class Grid
   ].freeze
 
   def initialize
-    @board = Array.new(7) { Array.new(6) }
+    @board = Array.new(7) { Array.new(6, ' ') }
     @available_columns = [1, 2, 3, 4, 5, 6, 7]
     @current_move = nil
   end
 
   def show
+    
     puts <<-HEREDOC
 
       |---+---+---+---+---+---+---|
@@ -32,12 +33,13 @@ class Grid
       |---+---+---+---+---+---+---|
       | #{board[0][0]} | #{board[1][0]} | #{board[2][0]} | #{board[3][0]} | #{board[4][0]} | #{board[5][0]} | #{board[6][0]} |
       |---+---+---+---+---+---+---|
+        1   2   3   4   5   6   7
 
     HEREDOC
   end
 
   def full?
-    board.flatten.none?(nil)
+    board.flatten.none?(' ')
   end
 
   def valid_column?(column)
@@ -59,11 +61,11 @@ class Grid
   end
 
   def nested_index(column)
-    board[column].index(nil)
+    board[column].index(' ')
   end
 
   def update_available_columns(column)
-    available_columns.delete(column) if board[column - 1].none?(nil)
+    available_columns.delete(column) if board[column - 1].none?(' ')
   end
 
   def winner?(game_piece)

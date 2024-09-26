@@ -18,7 +18,7 @@ class Game
   end
 
   def create_player(number, game_piece)
-    puts "Player #{number} will use '#{game_piece}' as their game piece."
+    puts "\nPlayer #{number} will use '#{game_piece}' as their game piece."
     puts "What's the name for player #{number}?"
     name = gets.chomp
     Player.new(name, game_piece)
@@ -33,7 +33,7 @@ class Game
   private
 
   def game_set_up
-    puts "Let's play a game of Connect Four in the command line"
+    puts "\nLet's play a game of Connect Four in the command line"
     @first_player = create_player(1, 'X')
     @second_player = create_player(2, 'O')
   end
@@ -63,7 +63,7 @@ class Game
 
   def conclusion
     if grid.winner?(current_player.game_piece)
-      puts "#{current_player.name} wins!"
+      puts "#{current_player.name} wins!\n"
     else
       puts "It's a tie."
     end
